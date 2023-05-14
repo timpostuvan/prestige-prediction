@@ -18,7 +18,7 @@ Edge features
 Initial analyses:
 * Cleaning the graph. 
 * Add additional features. Degree distribution, clustering coefficents on domains. 
-* * Number of nodes, number of edges, clustering coefficent, average degree, graph density, average distance, percentage male vs. female, gini coefficent, % international.
+    * Number of nodes, number of edges, clustering coefficent, average degree, graph density, average distance, percentage male vs. female, gini coefficent, % international.
 * Most international universities.
 * Remove non-US universities. 
 * How does diversity affect presitge? 
