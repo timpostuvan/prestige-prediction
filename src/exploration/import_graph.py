@@ -33,7 +33,7 @@ class AcademicGraph:
 
     def segmented_graphs(self, limit_to_US: bool = True): 
         temp = self.df.copy()
-        temp = temp[temp["TaxonomyLevel"] == "Domain"]
+        temp = temp[(temp["TaxonomyLevel"] == "Domain") | (temp["TaxonomyLevel"] == "Academia")]
         groups = temp.groupby("TaxonomyValue")          # groupby the domains
 
         graph_list, features, graph_labels = [], [], []
