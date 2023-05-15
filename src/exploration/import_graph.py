@@ -27,7 +27,8 @@ class AcademicGraph:
             self.df, 
             source="DegreeInstitutionId",
             targer="InstitutionId",
-            edge_attr=["TaxonomyLevel", "TaxonomyValue", "InstitutionName", "DegreeInstitutionName", "weight", "Men", "Women"]
+            edge_attr=["TaxonomyLevel", "TaxonomyValue", "InstitutionName", "DegreeInstitutionName", "weight", "Men", "Women"],
+            create_using=nx.DiGraph()
         )
         return G
 
@@ -57,7 +58,8 @@ class AcademicGraph:
                     group, 
                     source="DegreeInstitutionId", 
                     target="InstitutionId", 
-                    edge_attr=["TaxonomyLevel", "TaxonomyValue", "InstitutionName", "DegreeInstitutionName", "weight", "Men", "Women"]
+                    edge_attr=["TaxonomyLevel", "TaxonomyValue", "InstitutionName", "DegreeInstitutionName", "weight", "Men", "Women"],
+                    create_using=nx.DiGraph()
                 )
             )
 
