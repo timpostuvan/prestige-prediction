@@ -52,7 +52,13 @@ class AcademicGraph:
             if limit_to_US: 
                 group = group[group["location"] == 1]
 
-            graph_list.append(nx.from_pandas_edgelist(self.df, "DegreeInstitutionId", "InstitutionId", ["TaxonomyLevel", "TaxonomyValue", "InstitutionName", "DegreeInstitutionName", "weight", "Men", "Women"]))
-        
+            graph_list.append(
+                nx.from_pandas_edgelist(
+                    group, 
+                    source="DegreeInstitutionId", 
+                    target="InstitutionId", 
+                    edge_attr=["TaxonomyLevel", "TaxonomyValue", "InstitutionName", "DegreeInstitutionName", "weight", "Men", "Women"]
+                )
+            )
+
         return graph_labels, graph_list, features
-    
