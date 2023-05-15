@@ -41,7 +41,6 @@ class AcademicGraph:
 
         for name, group in groups:
             print(f"Preparing domain: {name}")
-            feat_dict = {}
 
             # all hires, men, women, percentage from US
             total, men, women, location = group["Total"].sum(), group["Men"].sum(), group["Women"].sum(), group["location"].mean()         
