@@ -1,7 +1,8 @@
 import networkx as nx
 
+
 def process_features(G: nx):
-    # extract some vanilla features from a graph G
+    #  extract some vanilla features from a graph G
 
     feats = {}
     feats["num_nodes"] = G.number_of_nodes()
