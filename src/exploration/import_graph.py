@@ -1,7 +1,6 @@
 ### let's use this for graph import and creation
 
 import pandas as pd
-import numpy as np
 from config import edge_list, data_dir
 import networkx as nx
 import os
@@ -9,52 +8,56 @@ import os
 
 class AcademicGraph:
     def __init__(self):
-        df = pd.read_csv(edge_list)
-        df["weight"] = df["Total"]
+        self.df_edges = pd.read_csv(edge_list)
+        self.df_edges = self.df_edges.rename(columns={"Total": "weight"})
 
-        #  connect to locations
-        country_pairings = pd.read_csv(os.path.join(data_dir, "university_country_pairing.csv"))
-        us_unis = country_pairings[country_pairings["CountryName"] == "United States"]
-        non_us_unis = country_pairings[country_pairings["CountryName"] != "United States"]
+        self.df_nodes = pd.read_csv(os.path.join(data_dir, "institution-stats.csv"))
 
-        self.us_unis = us_unis
-        self.non_us_unis = non_us_unis
-
-        self.df = df.merge(country_pairings[["DegreeInstitutionId", "CountryName"]], on="DegreeInstitutionId",
-                           how="left")
-        self.df["location"] = self.df["CountryName"].apply(
-            lambda x: 1 if x == "United States" else 0)  #  add a 1 for US locations, used later.
-
-    def segmented_graphs(self, limit_to_US: bool = True):
-        temp = self.df.copy()
-        temp = temp[(temp["TaxonomyLevel"] == "Domain") | (temp["TaxonomyLevel"] == "Academia")]
-        groups = temp.groupby("TaxonomyValue")  #  groupby the domains
+    def segmented_graphs(
+        self, 
+        node_attributes: list = ["NonAttritionEvents", "AttritionEvents", "ProductionRank", "PrestigeRank"],
+        edge_attributes: list = ["weight", "Men", "Women"]
+    ):
+        filtered_edges = self.df_edges[(self.df_edges["TaxonomyLevel"] == "Domain") | (self.df_edges["TaxonomyLevel"] == "Academia")]
+        filtered_nodes = self.df_nodes[(self.df_nodes["TaxonomyLevel"] == "Domain") | (self.df_nodes["TaxonomyLevel"] == "Academia")]
+        
+        groups = filtered_edges.groupby("TaxonomyValue")  #  group by the domains
 
         graph_list, features, graph_labels = [], [], []
-
-        for name, group in groups:
+        for name, group_edges in groups:
             print(f"Preparing domain: {name}")
 
-            # all hires, men, women, percentage from US
-            total, men, women, location = group["Total"].sum(), group["Men"].sum(), group["Women"].sum(), group[
-                "location"].mean()
+            # all hires, men, women
+            total, men, women = group_edges["weight"].sum(), group_edges["Men"].sum(), group_edges["Women"].sum()
+            features.append({"Total": total, "Men": men, "Women": women})
 
-            features.append({"Total": total, "Men": men, "Women": women, "Prop_US": location})
             graph_labels.append(name)
+            
+            group_nodes = filtered_nodes[filtered_nodes["TaxonomyValue"] == name]
+            group_ranked_institutions = set(group_nodes["InstitutionId"])
 
-            #  limit to only US relation
-            if limit_to_US:
-                group = group[group["location"] == 1]
-
-            graph_list.append(
-                nx.from_pandas_edgelist(
-                    group,
-                    source="DegreeInstitutionId",
-                    target="InstitutionId",
-                    edge_attr=["TaxonomyLevel", "TaxonomyValue", "InstitutionName", "DegreeInstitutionName", "weight",
-                               "Men", "Women"],
-                    create_using=nx.DiGraph()
-                )
+            # keep edges only between ranked institutions
+            keep_edges = (
+                group_edges["InstitutionId"].isin(group_ranked_institutions) & 
+                group_edges["DegreeInstitutionId"].isin(group_ranked_institutions)
             )
+            group_edges = group_edges[keep_edges]
+
+
+            # load edges
+            graph = nx.from_pandas_edgelist(
+                group_edges,
+                source="DegreeInstitutionId",
+                target="InstitutionId",
+                edge_attr=edge_attributes,
+                create_using=nx.DiGraph()
+            )
+
+            # load node attributes
+            for attr in node_attributes:
+                attr_values = {row[0]:row[1] for _, row in group_nodes[["InstitutionId", attr]].iterrows()}
+                nx.set_node_attributes(graph, attr_values, attr)
+
+            graph_list.append(graph)
 
         return graph_labels, graph_list, features
