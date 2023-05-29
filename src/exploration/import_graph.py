@@ -25,17 +25,6 @@ class AcademicGraph:
         self.df["location"] = self.df["CountryName"].apply(
             lambda x: 1 if x == "United States" else 0)  #  add a 1 for US locations, used later.
 
-    def full_graph(self) -> nx.Graph:
-        G = nx.from_pandas_edgelist(
-            self.df,
-            source="DegreeInstitutionId",
-            targer="InstitutionId",
-            edge_attr=["TaxonomyLevel", "TaxonomyValue", "InstitutionName", "DegreeInstitutionName", "weight", "Men",
-                       "Women"],
-            create_using=nx.DiGraph()
-        )
-        return G
-
     def segmented_graphs(self, limit_to_US: bool = True):
         temp = self.df.copy()
         temp = temp[(temp["TaxonomyLevel"] == "Domain") | (temp["TaxonomyLevel"] == "Academia")]
