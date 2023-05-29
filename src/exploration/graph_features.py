@@ -22,7 +22,6 @@ def process_features(G: nx):
     feats["diameter"] = nx.diameter(G)
 
     feats["algebraic_connectivity"] = nx.algebraic_connectivity(G)
-    feats["weighted_algebraic_connectivity"] = nx.algebraic_connectivity(G, weight="weight")
     return feats
 
 
