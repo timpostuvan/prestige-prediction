@@ -15,11 +15,17 @@ class PyGAcademicGraph(Dataset):
         self,
         data_dir: str = "../data",
         split: str = "train",
-        setting: str = "transductive"
+        setting: str = "transductive",
+        sparcify_threshold: float = None   
     ):
         self.setting = setting
+        self.sparcify_threshold = sparcify_threshold 
         
-        dataset_path = join(data_dir, setting)
+        if sparcify_threshold == None:
+            dataset_path = join(data_dir, setting)
+        else: 
+            dataset_path = join(data_dir, setting + f"{sparcify_threshold}")
+        
         if not exists(dataset_path):
             graphs = self.create_dataset()
             Path(dataset_path).mkdir(parents=True)
@@ -43,11 +49,14 @@ class PyGAcademicGraph(Dataset):
         for graph in nx_graphs:
             for _, data in graph.nodes(data=True):
                 data["y"] = data.pop("PrestigeRank")
-        
+                
+        if self.sparcify_threshold is not None:
+            nx_graphs = self.sparcify_graphs(nx_graphs, self.sparcify_threshold)
+
         # add topological features
         for graph in nx_graphs:
             nx.set_node_attributes(graph, nx.betweenness_centrality(graph), "betweenness_centrality")
-            nx.set_node_attributes(graph, nx.eigenvector_centrality(graph), "eigenvector_centrality")
+            nx.set_node_attributes(graph, nx.eigenvector_centrality(graph, max_iter=750), "eigenvector_centrality")
             nx.set_node_attributes(graph, nx.clustering(graph), "clustering_coefficient")
             nx.set_node_attributes(graph, nx.degree_centrality(graph), "degree_centrality")
             nx.set_node_attributes(graph, nx.centrality.closeness_centrality(graph), "closeness_centrality")
@@ -135,6 +144,13 @@ class PyGAcademicGraph(Dataset):
         else:
             raise ValueError("Not a supported setting.")
 
+        return graphs
+    
+    def sparcify_graphs(self, graphs, threshold):
+        for graph in graphs:
+            for u, v, data in list(graph.edges(data=True)):   # using list to avoid 'dictionary changed size during iteration' RuntimeError
+                if data['weight'] < threshold:
+                    graph.remove_edge(u, v)
         return graphs
 
     def __len__(self):
