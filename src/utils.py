@@ -38,7 +38,7 @@ def train(model, loss_fcn, device, optimizer, num_epochs, train_dataloader, val_
             train_batch_device = train_batch.to(device)
 
             # logits is the output of the model
-            logits = model(train_batch_device.x, train_batch_device.edge_index)
+            logits = model(train_batch_device.x, train_batch_device.edge_index, train_batch.edge_attr)
 
             # compute the loss
             loss = loss_fcn(logits[mask].flatten(), train_batch_device.y[mask])
@@ -76,7 +76,7 @@ def evaluate(model, loss_fcn, device, dataloader):
             continue
 
         batch = batch.to(device)
-        output = model(batch.x, batch.edge_index)
+        output = model(batch.x, batch.edge_index, batch.edge_attr)
         loss_test = loss_fcn(output[mask].flatten(), batch.y[mask])
         
         all_predictions.append(output[mask].detach().cpu().numpy())
