@@ -1,11 +1,15 @@
-import numpy as np 
-import torch 
+import copy
+
+import numpy as np
+import torch
 from sklearn.metrics import mean_squared_error
 
 
 def train(model, loss_fcn, device, optimizer, num_epochs, train_dataloader, val_dataloader):
     epoch_list = []
     scores_list = []
+    best_val_score = float("inf")
+    best_model = model
 
     # loop over epochs
     for epoch in range(num_epochs):
@@ -40,10 +44,14 @@ def train(model, loss_fcn, device, optimizer, num_epochs, train_dataloader, val_
             # computes the f1-score (see next function)
             score = evaluate(model, loss_fcn, device, val_dataloader)
             print("MSE: {:.4f}".format(score))
+            if best_val_score > score:
+                best_val_score = score
+                best_model = copy.deepcopy(model)
+
             scores_list.append(score)
             epoch_list.append(epoch)
 
-    return epoch_list, scores_list
+    return epoch_list, scores_list, best_model
 
 def evaluate(model, loss_fcn, device, dataloader):
     all_predictions, all_labels = [], []
