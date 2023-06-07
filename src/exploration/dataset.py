@@ -16,16 +16,12 @@ class PyGAcademicGraph(Dataset):
         data_dir: str = "../data",
         split: str = "train",
         setting: str = "transductive",
-        sparcify_threshold: float = None   
+        sparsify_threshold: int = None   
     ):
         self.setting = setting
-        self.sparcify_threshold = sparcify_threshold 
+        self.sparsify_threshold = sparsify_threshold 
         
-        if sparcify_threshold == None:
-            dataset_path = join(data_dir, setting)
-        else: 
-            dataset_path = join(data_dir, setting + f"{sparcify_threshold}")
-        
+        dataset_path = join(data_dir, setting)
         if not exists(dataset_path):
             graphs = self.create_dataset()
             Path(dataset_path).mkdir(parents=True)
@@ -33,7 +29,19 @@ class PyGAcademicGraph(Dataset):
             with open(join(dataset_path, "graphs.pkl"), "wb") as f:
                 pickle.dump(graphs, f)
 
-        
+        if sparsify_threshold is not None:
+            sparsified_dataset_path = join(data_dir, setting + f"{sparsify_threshold}")
+            if not exists(sparsified_dataset_path):
+                Path(sparsified_dataset_path).mkdir(parents=True)
+                with open(join(dataset_path, "graphs.pkl"), "rb") as f:
+                    graphs = pickle.load(f)
+                
+                graphs = self.sparsify_graphs(graphs, threshold=sparsify_threshold)
+                with open(join(sparsified_dataset_path, "graphs.pkl"), "wb") as f:
+                    pickle.dump(graphs, f)
+            
+            dataset_path = sparsified_dataset_path
+
         with open(join(dataset_path, "graphs.pkl"), "rb") as f:
             self.graphs = pickle.load(f)
 
@@ -146,11 +154,11 @@ class PyGAcademicGraph(Dataset):
 
         return graphs
     
-    def sparcify_graphs(self, graphs, threshold):
+    def sparsify_graphs(self, graphs, threshold):
         for graph in graphs:
-            for u, v, data in list(graph.edges(data=True)):   # using list to avoid 'dictionary changed size during iteration' RuntimeError
-                if data['weight'] < threshold:
-                    graph.remove_edge(u, v)
+            keep_edges = graph.edge_attr[:, 0] > threshold
+            graph.edge_index = graph.edge_index[:, keep_edges]
+            graph.edge_attr = graph.edge_attr[keep_edges, :]
         return graphs
 
     def __len__(self):
