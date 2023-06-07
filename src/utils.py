@@ -2,6 +2,7 @@ import copy
 
 import numpy as np
 import torch
+import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 
 
@@ -74,3 +75,15 @@ def evaluate(model, loss_fcn, device, dataloader):
     all_predictions = np.concatenate(all_predictions)
     all_labels = np.concatenate(all_labels)
     return mean_squared_error(all_labels, all_predictions)
+
+def plot_MSE_scores(epoch_lists: list, MSE_scores: list, model_name: str):
+    plt.figure(figsize = [10,5])
+    for i in range(len(epoch_lists)):
+        plt.plot(epoch_lists[i], MSE_scores[i], 'b', label=f"{model_name}-{i}")
+
+    plt.title("Evolution of MSE score w.r.t epochs")
+    plt.ylim([0.0, 1.0])
+    plt.ylabel("MSE")
+    plt.xlabel("Epochs")
+    plt.legend()
+    plt.show()
