@@ -1,10 +1,20 @@
 import copy
 
+import os
+import random
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 
+
+def set_all_seeds(seed):
+  random.seed(seed)
+  os.environ['PYTHONHASHSEED'] = str(seed)
+  np.random.seed(seed)
+  torch.manual_seed(seed)
+  torch.cuda.manual_seed(seed)
+  torch.backends.cudnn.deterministic = True
 
 def train(model, loss_fcn, device, optimizer, num_epochs, train_dataloader, val_dataloader):
     epoch_list = []
