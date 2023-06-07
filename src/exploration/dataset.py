@@ -57,9 +57,6 @@ class PyGAcademicGraph(Dataset):
         for graph in nx_graphs:
             for _, data in graph.nodes(data=True):
                 data["y"] = data.pop("PrestigeRank")
-                
-        if self.sparcify_threshold is not None:
-            nx_graphs = self.sparcify_graphs(nx_graphs, self.sparcify_threshold)
 
         # add topological features
         for graph in nx_graphs:
