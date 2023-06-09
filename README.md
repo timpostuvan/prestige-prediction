@@ -21,7 +21,7 @@ To re-run the experiments in the paper, we list how the Jupyter Notebooks are st
 ## Main code description
 * In `exploration/import_graph.py` we extract the graphs and perform initial filtering. 
 * In `exploration/graph_features.py` we extract the topological features. 
-* The PyTorch Geometric dataset used in all analyses is created in `exploration/dataset.py`. In the dataset, we provide two approaches to perform train/validation/test splits: (1) transductive, and (2) inductive. 
+* The PyTorch Geometric dataset used in all analyses is created in `exploration/dataset.py`. In the dataset, we provide two approaches to create train/validation/test splits: (1) transductive, and (2) inductive. 
 * Additionally, the models that we conduct experiments on are included in `exploitation/models.py`. 
 
 You can read about experiments in our paper [here](https://github.com/vminvsky/nml-project/blob/main/paper.pdf).
