@@ -6,7 +6,9 @@ This is the code base for the paper `From Pedagogy to Prestige:\\Predicting Pres
 ## Requirements
 You can install all the required packages using the following command:
 
-```pip install -r requirements.txt```
+```
+pip install -r requirements.txt
+```
 
 ## Jupyter Notebook description
 To re-run the experiments in the paper we list how the Jupyter Notebooks are structured. Note that for files starting with 1, 2, 3 we have two versions on for transductive and the other for inductive. 
