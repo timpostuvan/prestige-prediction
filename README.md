@@ -3,6 +3,11 @@ Tim Postuvan and Veniamin Veselovsky
 
 This is the code base for the paper `From Pedagogy to Prestige:\\Predicting Prestige Using Academic Hiring Networks`. This paper defines a few ML models for predicting prestige from a [faculty hiring graph](https://github.com/LarremoreLab/us-faculty-hiring-networks). More information about the dataset and intial paper is available [here](https://www.nature.com/articles/s41586-022-05222-x).
 
+## Requirements
+You can install all the required packages using the following command:
+
+```pip install -r requirements.txt```
+
 ## Jupyter Notebook description
 To re-run the experiments in the paper we list how the Jupyter Notebooks are structured. Note that for files starting with 1, 2, 3 we have two versions on for transductive and the other for inductive. 
 
