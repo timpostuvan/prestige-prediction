@@ -1,43 +1,26 @@
-### NML Project
+# From Pedagogy to Prestige: Predicting Prestige Using Academic Hiring Networks
+Tim Postuvan and Veniamin Veselovsky
 
-Node level features
-* Rank
-* Field
-* Presitge
-* Production Rank? 
+This is the code base for the paper `From Pedagogy to Prestige:\\Predicting Prestige Using Academic Hiring Networks`. This paper defines a few ML models for predicting prestige from a [faculty hiring graph](https://github.com/LarremoreLab/us-faculty-hiring-networks). More information about the dataset and intial paper is available [here](https://www.nature.com/articles/s41586-022-05222-x).
 
-Staff make-up:
-* Attrition
-* Up Hires / Down Hires
+## Requirements
+You can install all the required packages using the following command:
 
-Edge features
-* University (from -> to)
+```
+pip install -r requirements.txt
+```
 
+## Jupyter Notebook description
+To re-run the experiments in the paper we list how the Jupyter Notebooks are structured. Note that for files starting with 1, 2, 3 we have two versions on for transductive and the other for inductive. 
 
+1. In `0_exploration.ipynb` we conduct the exploration found in our paper. This includes extracting the clusters, random graph approximations, domain-level features, and variance graphs.
+2. In `1_average_baseline_*` we measure the basic average baseline for our models.
+2. In `2_linear_regression_*` we run the linear regression on the node and topological features. 
+2. In `3_gnn_*` we train our GNN from scratch and evaluate it on our test set. 
 
-Initial analyses:
-* Cleaning the graph. 
-* Add additional features. Degree distribution, clustering coefficents on domains. 
-    * Number of nodes, number of edges, clustering coefficent, average degree, graph density, average distance, percentage male vs. female, gini coefficent, % international.
-* Most international universities.
-* Remove non-US universities. 
-* How does diversity affect presitge? 
-* 8 domains + academia. 
-* Clustering coefficents / 
+## Main code description
+* `exploration/import_graph.py` we extract the graph and conduct initial filterings. 
+* `exploration/graph_features.py` we extract the topological features. 
+* The PyTorch Geometric dataset for all analyses that proceed is created in `exploration/dataset.py`. In the dataset we provide two splitting techniques for the graph: (1) transductive and (2) inductive. 
+* Additionally, the models used for training are included in `exploitation/models.py`. 
 
-
-Sample tasks:
-* Predict university rank given hiring decisions
-* Predict faculty gender / race based on geography / taxonomy
-
-Exploration:
-* Can geography affect hiring decisions. Are there more conservative regions than others?
-* Consider the US institutions. Add a field for hires outside the United States. How much they hire by specific country. 
-
-Why we cut density
-* The graph is highly dense and we don't want over-smoothing. We use a PMI method to only keep edge weights for institutions that are highly important for institution. 
-
-For GNN
-1. Only ConvGNN. With some simple cutoff, with mutual information.
-2. For message propogation be careful about the directions. flow="source_to_target".
-3. Normalize the data.
